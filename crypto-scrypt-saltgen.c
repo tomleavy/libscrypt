@@ -4,14 +4,34 @@
 #include <errno.h>
 #include <fcntl.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
 #ifndef S_SPLINT_S /* Including this here triggers a known bug in splint */
 #include <unistd.h>
 #endif
-
 #define RNGDEV "/dev/urandom"
+#endif
+
 
 int libscrypt_salt_gen(uint8_t *salt, size_t len)
 {
+#ifdef _WIN32
+    
+    HCRYPTPROV hProvider;
+    
+    if (!CryptAcquireContextW(&hProvider, NULL, NULL, PROV_RSA_FULL,
+                             CRYPT_VERIFYCONTEXT | CRYPT_SILENT)) {
+        return -1;
+    }
+    
+    BOOL res = CryptGenRandom(hProvider, (DWORD)len, salt);
+    CryptReleaseContext(hProvider, 0);
+    
+    return res ? 0 : -1;
+    
+#else
+    
 	unsigned char buf[len];
 	size_t data_read = 0;
 	int urandom = open(RNGDEV, O_RDONLY);
@@ -45,4 +65,5 @@ int libscrypt_salt_gen(uint8_t *salt, size_t len)
 	memcpy(salt, buf, len);
 
 	return 0;
+#endif
 }
