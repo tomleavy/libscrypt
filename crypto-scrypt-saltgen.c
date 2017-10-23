@@ -5,7 +5,9 @@
 #include <fcntl.h>
 
 #ifdef _WIN32
+#pragma warning(push, 0)
 #include <windows.h>
+#pragma warning(pop)
 #else
 #ifndef S_SPLINT_S /* Including this here triggers a known bug in splint */
 #include <unistd.h>
