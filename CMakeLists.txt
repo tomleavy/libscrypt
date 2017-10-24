@@ -6,6 +6,17 @@ project(libscrypt VERSION 1.21 LANGUAGES C)
 
 enable_testing()
 
+include(CheckCSourceRuns)
+
+check_c_source_runs("
+        #include <stdlib.h>
+        int main()
+        {
+          void* mem;
+          return posix_memalign (&mem, 16, 100);
+        }"
+        HAVE_POSIX_MEMALIGN)
+
 add_library(scrypt
     b64.c
     crypto-mcf.c
@@ -17,7 +28,15 @@ add_library(scrypt
     sha256.c
     slowequals.c)
 
-set_target_properties(scrypt PROPERTIES COMPILE_FLAGS "-Wall -fstack-protector -D_FORTIFY_SOURCE=2")
+set(ScryptCompileFlags "-Wall" "-fstack-protector" "-D_FORTIFY_SOURCE=2")
+
+if (HAVE_POSIX_MEMALIGN)
+    list(APPEND ScryptCompileFlags "-DHAVE_POSIX_MEMALIGN")
+endif (HAVE_POSIX_MEMALIGN)
+
+string (REPLACE ";" " " SCRYPT_COMPILE_FLAGS "${ScryptCompileFlags}")
+
+set_target_properties(scrypt PROPERTIES COMPILE_FLAGS "${SCRYPT_COMPILE_FLAGS}")
 
 install(TARGETS scrypt EXPORT ScryptConfig
     ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
