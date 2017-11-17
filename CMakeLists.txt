@@ -43,7 +43,7 @@ install(TARGETS scrypt EXPORT ScryptConfig
     LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-install(EXPORT ScryptConfig DESTINATION ${CMAKE_INSTALL_LIBDIR}/libscrypt/cmake)
+install(EXPORT ScryptConfig DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
 install(FILES "libscrypt.h" DESTINATION include/libscrypt)
 
 export(TARGETS scrypt FILE ScryptConfig.cmake)
