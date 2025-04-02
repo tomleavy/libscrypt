@@ -69,3 +69,5 @@ int libscrypt_salt_gen(uint8_t *salt, size_t len)
 	return 0;
 #endif
 }
+
+#endif
